@@ -1,3 +1,33 @@
-<p>
-  login works!
-</p>
+<form [formGroup]="frmLogin" (submit)="login()">
+  <table>
+      <tr>
+          <td>Login</td>
+      </tr>
+      <tr>
+          <td>Email</td>
+          <td>
+              <input type="email" formControlName="email" name="email" placeholder="email">
+          </td>
+          <td>
+              <control-messages [control]="frmLogin.controls.email" msg="Email is required"></control-messages>
+          </td>
+      </tr>
+      <tr>
+          <td>Password</td>
+          <td>
+              <input type="password" formControlName="passwd" name="passwd" placeholder="password">
+          </td>
+          <td>
+              <control-messages [control]="frmLogin.controls.passwd"></control-messages>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <button type="submit" name="login" value="login">Login</button>
+          </td>
+      </tr>
+  </table>
+  <div>don't have an account?
+          <a  routerLink="/account/register" class="btn btn-link" style="color:chocolate">Register</a>
+      </div>
+</form>
