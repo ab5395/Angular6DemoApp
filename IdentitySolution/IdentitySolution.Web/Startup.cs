@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Threading.Tasks;
 using IdentitySolution.Data;
+using IdentitySolution.TokenHelper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdentitySolution.Web
 {
@@ -56,42 +61,47 @@ namespace IdentitySolution.Web
                 options.SlidingExpiration = true;
             });
 
-            ////Jwt Configuration
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //        .AddJwtBearer(options =>
-            //        {
-            //            options.TokenValidationParameters = new TokenValidationParameters
-            //            {
-            //                ValidateIssuer = true,
-            //                ValidateAudience = true,
-            //                ValidateLifetime = true,
-            //                ValidateIssuerSigningKey = true,
+            //Jwt Configuration
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
 
-            //                ValidIssuer = "Fiver.Security.Bearer",
-            //                ValidAudience = "Fiver.Security.Bearer",
-            //                IssuerSigningKey = JwtSecurityKey.Create()
-            //            };
+                            ValidIssuer = "Fiver.Security.Bearer",
+                            ValidAudience = "Fiver.Security.Bearer",
+                            IssuerSigningKey = JwtSecurityKey.Create()
+                        };
 
-            //            options.Events = new JwtBearerEvents
-            //            {
-            //                OnAuthenticationFailed = context =>
-            //                {
-            //                    Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
-            //                    return Task.CompletedTask;
-            //                },
-            //                OnTokenValidated = context =>
-            //                {
-            //                    Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
-            //                    return Task.CompletedTask;
-            //                }
-            //            };
-            //        });
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnAuthenticationFailed = context =>
+                            {
+                                Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+                                return Task.CompletedTask;
+                            },
+                            OnTokenValidated = context =>
+                            {
+                                Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+                                return Task.CompletedTask;
+                            }
+                        };
+                    });
 
             services.AddAuthorization();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/dist";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,10 +115,19 @@ namespace IdentitySolution.Web
             {
                 app.UseHsts();
             }
-            app.UseStaticFiles();
             app.UseHttpsRedirection();
-            app.UseAuthentication();
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+            app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+                if (env.IsDevelopment())
+                {
+                    spa.UseAngularCliServer(npmScript: "start");
+                }
+            });
         }
     }
 }
