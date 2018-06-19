@@ -1,0 +1,9 @@
+Create app
+ng new folderName
+
+Crete new component
+ng g c componentName
+
+Create Route Module For Routing
+Link:		https://angular.io/tutorial/toh-pt5
+Command:	ng generate module app-routing --flat --module=app
