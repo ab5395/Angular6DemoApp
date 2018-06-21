@@ -1,0 +1,36 @@
+https://stackoverflow.com/questions/48970553/want-to-upgrade-project-from-angular-v5-to-angular-v6
+
+
+
+
+Edit on 07-May-2018 : Version 6 of Angular has been released Official Angular blog link. I have mentioned general upgrade steps below, but before and after the update you need to make changes in your code to make it workable in v6, for that detailed information visit official website https://update.angular.io .
+
+Upgrade Steps :
+
+    Make sure NodeJS version is 8.9+ if not update it.
+
+    Update Angular cli globally and locally, and migrate the old configuration .angular-cli.json to the new angular.json format by running the following :
+
+        npm install -g @angular/cli
+        npm install @angular/cli
+        ng update @angular/cli
+
+    Update all of your Angular framework packages to v6,and the correct version of RxJS and TypeScript by running the following:
+
+        ng update @angular/core
+
+    Update Angular Material to the latest version by running the following:
+
+        ng update @angular/material
+
+    RxJS v6 has major changes from v5, v6 brings backwards compatibility package rxjs-compat that will keep your applications working, but you should refactor TypeScript code so that it doesn't depend on rxjs-compat. To refactor TypeScript code run following:
+
+        npm install -g rxjs-tslint
+        rxjs-5-to-6-migrate -p src/tsconfig.app.json
+
+    Note :- Once all of your dependencies have updated to RxJS 6, remove rxjs- compat as it increases bundle size. please see this RxJS Upgrade Guide for more info.
+
+        npm uninstall rxjs-compat
+
+    Done run ng serve to check it.
+    If you get errors in build refer https://update.angular.io for detailed info.
